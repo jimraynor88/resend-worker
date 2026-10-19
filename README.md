@@ -27,7 +27,12 @@ En el panel del Worker, ve a **Settings** → **Variables and Secrets**. Añade 
 | `SHARED_SECRET` | Secret | Cadena larga y aleatoria (mín. 32 caracteres). | Sí |
 | `ALLOWED_ORIGIN` | Text | El dominio de tu tienda (ej. `https://tudominio.com`). | Sí |
 
-> **Cómo generar `SHARED_SECRET`:** abre la consola del navegador (F12) y ejecuta `crypto.randomUUID() + crypto.randomUUID()`. Copia el resultado.
+> **Cómo generar `SHARED_SECRET`:** abre la consola del navegador (F12) y ejecuta
+
+```javascript
+crypto.randomUUID() + crypto.randomUUID()
+```
+Copia el resultado.
 
 ## Código del Worker (`worker.js`)
 
@@ -122,3 +127,12 @@ function j(obj, status, cors) {
     headers: Object.assign({}, cors, { "Content-Type": "application/json" })
   });
 }
+```
+## Problemas comunes
+
+| Síntoma | Causa probable | Solución |
+| :--- | :--- | :--- |
+| `403 Forbidden` | El `SHARED_SECRET` no coincide. | Revisa que sea idéntico en Cloudflare y en el editor. |
+| `502 Error de Resend` | `FROM_EMAIL` no está verificado. | Verifica el dominio en el panel de Resend. |
+| `429 Cooldown activo` | Ya se envió un email a ese destinatario hace poco. | Espera o usa otro email de prueba. |
+| No llega ningún email. | Los registros DNS (SPF/DKIM) están incompletos. | Revisa la configuración del dominio en Resend. |

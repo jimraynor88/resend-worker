@@ -1,4 +1,4 @@
-# Worker Resend · Tienda
+# Resend Worker
 
 Proxy ligero en Cloudflare Workers que reenvía los emails transaccionales de tu tienda a Resend.
 

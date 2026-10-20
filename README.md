@@ -2,7 +2,7 @@
 
 Proxy ligero en Cloudflare Workers que reenvía los emails transaccionales de tu tienda a Resend.
 
-[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/TU_USUARIO/TU_REPO)
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/jimraynor88/resend-worker)
 
 ## Despliegue en 1 clic
 

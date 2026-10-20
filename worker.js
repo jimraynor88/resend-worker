@@ -3,15 +3,18 @@
 //   RESEND_API_KEY  → re_xxxxxxxxxxxxxxxx
 //   FROM_EMAIL      → remitente verificado en Resend
 //   SHARED_SECRET   → cadena larga aleatoria (32+ chars)
-//   ALLOWED_ORIGIN  → dominio de la tienda (o * en pruebas)
-// Sin KV, sin D1, sin R2. Rate limiting con Cache API nativa.
+//   ALLOWED_ORIGIN  → uno o varios dominios, separados por coma
+//                     Ej: https://mi-tienda.pages.dev,https://mitienda.com
+//                     Usa * para permitir todos (solo pruebas)
 
 export default {
   async fetch(request, env) {
+    const origin = getAllowedOrigin(request, env);
     const cors = {
-      "Access-Control-Allow-Origin": env.ALLOWED_ORIGIN || "*",
+      "Access-Control-Allow-Origin": origin,
       "Access-Control-Allow-Methods": "POST, OPTIONS",
       "Access-Control-Allow-Headers": "Content-Type",
+      "Vary": "Origin",
     };
     if (request.method === "OPTIONS") return new Response(null, { headers: cors });
     if (request.method !== "POST") return j({ error: "Method not allowed" }, 405, cors);
@@ -58,6 +61,20 @@ export default {
     return j({ ok: true, id: data.id }, 200, cors);
   }
 };
+
+// Devuelve el origen permitido según ALLOWED_ORIGIN.
+// - Si ALLOWED_ORIGIN contiene "*" → devuelve "*".
+// - Si el Origin de la petición está en la lista → devuelve ese Origin.
+// - Si no está en la lista → devuelve el primero (para que el navegador
+//   bloquee por CORS de forma clara en vez de fallar en silencio).
+function getAllowedOrigin(request, env) {
+  const raw = String(env.ALLOWED_ORIGIN || "*");
+  const list = raw.split(",").map(function(s){ return s.trim(); }).filter(Boolean);
+  if (list.includes("*") || list.length === 0) return "*";
+  const origin = request.headers.get("Origin") || "";
+  if (list.includes(origin)) return origin;
+  return list[0];
+}
 
 function limits(type) {
   if (type === "order")    return { windowSec: 86400, destMax: 3,  ipMax: 10 };
